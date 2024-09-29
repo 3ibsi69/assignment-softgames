@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/navbar/navbar";
 import Home from "./pages/home";
 import GameDetails from "./pages/gameDetails";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<GameDetails />} />
+          <Route path="/details/:id" element={<GameDetails />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

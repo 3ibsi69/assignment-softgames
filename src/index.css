@@ -3,14 +3,37 @@
 @tailwind utilities;
 
 html {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .dark {
   background-color: #2d3748;
   color: #ffffff;
 }
+
+
+/* 
+.dark .ant-pagination-item {
+  background-color: transparent !important;
+  border-color: #555 !important;
+}
+
+.dark .ant-pagination-item a {
+  color: #fff !important;
+}
+
+
+
+.dark .ant-pagination-prev .ant-pagination-item-link,
+.dark .ant-pagination-next .ant-pagination-item-link {
+  color: #fff !important;
+}
+
+.dark .ant-pagination-item:hover {
+  background-color: #444 !important;
+  border-color: #444 !important;
+} */

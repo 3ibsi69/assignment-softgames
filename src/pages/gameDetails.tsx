@@ -1,7 +1,9 @@
+import { useParams } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
 export default function GameDetails() {
   const { theme } = useTheme();
+  const { id } = useParams();
 
   return (
     <div className="flex justify-center items-center flex-grow">
@@ -10,7 +12,7 @@ export default function GameDetails() {
           theme === "dark" ? "text-white" : "text-black"
         }`}
       >
-        About Us
+        About Us Page {id}
       </h1>
     </div>
   );

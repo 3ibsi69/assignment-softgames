@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-interface ThemeContextType {
-  theme: string;
-  toggleTheme: () => void;
-}
+import { ThemeContextType } from "../../types/state-types";
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
