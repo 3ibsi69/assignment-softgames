@@ -33,6 +33,34 @@ export const optionsFilter: OptionFilter[] = [
           },
         ],
       },
+      {
+        value: "PublisherSort",
+        label: "Publisher",
+        children: [
+          {
+            value: "ascendPub",
+            label: "Ascending",
+          },
+          {
+            value: "descendPub",
+            label: "Descending",
+          },
+        ],
+      },
+      {
+        value: "TypeSort",
+        label: "Type",
+        children: [
+          {
+            value: "ascendType",
+            label: "Ascending",
+          },
+          {
+            value: "descendType",
+            label: "Descending",
+          },
+        ],
+      },
     ],
   },
   {

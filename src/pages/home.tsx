@@ -92,7 +92,11 @@ export default function Home() {
         break;
       case "ascendPub":
       case "descendPub":
-        sortGames("publisher", selectedKey);
+        sortGames("PublisherSort", selectedKey);
+        break;
+      case "ascendType":
+      case "descendType":
+        sortGames("TypeSort", selectedKey);
         break;
       case "true":
       case "false":
@@ -134,6 +138,25 @@ export default function Home() {
             : bValue.localeCompare(aValue);
         });
         break;
+      case "PublisherSort":
+        sortedGames.sort((a, b) => {
+          const aValue = a.publisher?.charAt(0).toLowerCase() ?? "";
+          const bValue = b.publisher?.charAt(0).toLowerCase() ?? "";
+          return value === "ascendPub"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        });
+        break;
+      case "TypeSort":
+        sortedGames.sort((a, b) => {
+          const aValue = a.type.charAt(0).toLowerCase() ?? "";
+          const bValue = b.type.charAt(0).toLowerCase() ?? "";
+          return value === "ascendType"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        });
+        break;
+
       case "standalone":
         sortedGames = sortedGames.filter((game) => game.standalone === value);
         break;
