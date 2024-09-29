@@ -19,6 +19,20 @@ export const optionsFilter: OptionFilter[] = [
           },
         ],
       },
+      {
+        value: "Name",
+        label: "Name",
+        children: [
+          {
+            value: "ascend",
+            label: "Ascending",
+          },
+          {
+            value: "descend",
+            label: "Descending",
+          },
+        ],
+      },
     ],
   },
   {

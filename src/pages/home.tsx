@@ -78,11 +78,21 @@ export default function Home() {
   ) => {
     const selectedValue = selectedOptions[selectedOptions.length - 1];
     const selectedKey = selectedValue.value;
+    console.log(selectedKey);
+    console.log(selectedValue);
 
     switch (selectedKey) {
       case "asc":
       case "desc":
         sortGames("releaseYear", selectedKey);
+        break;
+      case "ascend":
+      case "descend":
+        sortGames("name", selectedKey);
+        break;
+      case "ascendPub":
+      case "descendPub":
+        sortGames("publisher", selectedKey);
         break;
       case "true":
       case "false":
@@ -113,6 +123,15 @@ export default function Home() {
           const aValue = a.releaseYear ?? 0;
           const bValue = b.releaseYear ?? 0;
           return value === "asc" ? aValue - bValue : bValue - aValue;
+        });
+        break;
+      case "name":
+        sortedGames.sort((a, b) => {
+          const aValue = a.name.charAt(0).toLowerCase();
+          const bValue = b.name.charAt(0).toLowerCase();
+          return value === "ascend"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
         });
         break;
       case "standalone":
