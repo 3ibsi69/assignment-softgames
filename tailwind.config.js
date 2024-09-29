@@ -5,8 +5,13 @@ module.exports = {
   ],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        customOrange: '#F06428',
+        customOrangeLight: '#FF8C00',
+      },
+
+    },
   },
   plugins: [],
 }
-

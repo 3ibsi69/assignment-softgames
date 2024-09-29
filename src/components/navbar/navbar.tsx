@@ -30,7 +30,9 @@ export default function Navbar() {
   return (
     <nav className="flex justify-between items-center p-4 shadow mb-4 flex-wrap bg-white dark:bg-gray-800">
       <div className="text-lg font-bold">
-        <Link to="/">SoftGames</Link>
+        <Link to="/"
+          className="nav-link text-customOrange dark:text-white"
+        >SoftGames</Link>
       </div>
       <div className="flex items-center md:hidden">
         <div onClick={handleToggleMenu} className="text-2xl cursor-pointer">
@@ -42,23 +44,21 @@ export default function Navbar() {
         </div>
       </div>
       <div
-        className={`flex-col md:flex-row ${
-          isOpen
-            ? "flex border-b-2 border-gray-300 dark:border-gray-600"
-            : "hidden md:flex"
-        } md:flex items-center md:visible absolute md:static top-14 left-0 w-full md:w-auto transition-all duration-300`}
+        className={`flex-col md:flex-row ${isOpen
+          ? "flex border-b-2 border-gray-300 dark:border-gray-600"
+          : "hidden md:flex"
+          } md:flex items-center md:visible absolute md:static top-14 left-0 w-full md:w-auto transition-all duration-300`}
       >
-        <Link to="/" className="nav-link px-4 py-2 hover:underline">
+        <Link to="/" className="nav-link px-4 py-2 hover:underline text-customOrange dark:text-white">
           Home
         </Link>
-        <Link to="/about" className="nav-link px-4 py-2 hover:underline">
-          About
-        </Link>
+
         <div
           onClick={toggleTheme}
-          className={`cursor-pointer text-2xl ml-4 ${
-            !isOpen ? "block" : "hidden"
-          }`}
+          className={`cursor-pointer text-2xl ml-4 ${!isOpen ? "block" : "hidden"
+            }
+             text-customOrange dark:text-white
+            `}
         >
           {theme === "light" ? <MdOutlineDarkMode /> : <CiLight />}
         </div>

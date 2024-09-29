@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { GameType } from "../../types/state-types";
-import {
-  Card,
-  Spin,
-  Typography,
-  Pagination,
-  Skeleton,
-  Input,
-  Dropdown,
-  Menu,
-} from "antd";
+import { GameType, OptionFilter } from "../../types/state-types";
+import { Spin, Typography, Input, CascaderProps, Cascader } from "antd";
 import GameCard from "../components/card/gameCard";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import Pagination from "../components/Pagination/Pagination";
+import ClearIcon from "@mui/icons-material/Clear";
+import { optionsFilter } from "../utils/cascader-options";
 
 export default function Home() {
   const [games, setGames] = useState<GameType[]>([]);
@@ -21,62 +15,71 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [gamesPerPage] = useState(8);
+  const [filterValue, setFilterValue] = useState<string | undefined>(undefined);
+  const [filteredOptions, setFilteredOptions] = useState<OptionFilter[]>(optionsFilter);
 
-  const sortGamesByReleaseYear = (order: "asc" | "desc") => {
-    const sortedGames = [...games].sort((a, b) => {
-      const aValue = a.releaseYear;
-      const bValue = b.releaseYear;
 
-      setCurrentPage(1);
-      return order === "asc"
-        ? (aValue ?? 0) - (bValue ?? 0)
-        : (bValue ?? 0) - (aValue ?? 0);
-    });
 
-    setGames(sortedGames);
+  const onChange: CascaderProps<OptionFilter>['onChange'] = (value, selectedOptions) => {
+    const selectedValue = selectedOptions[selectedOptions.length - 1];
+    const selectedKey = selectedValue.value;
+
+    switch (selectedKey) {
+      case 'asc':
+      case 'desc':
+        sortGames('releaseYear', selectedKey);
+        break;
+      case 'true':
+      case 'false':
+        sortGames('standalone', selectedKey === 'true');
+        break;
+      case 'BaseGame':
+      case 'Expansion':
+        sortGames('type', selectedKey);
+        break;
+      default:
+        if (selectedKey) {
+          sortGames('publisher', selectedKey);
+        }
+        break;
+    }
+    setFilterValue(selectedOptions.map((o) => o.label).join(', '));
   };
 
-  const sortGamesByStandalone = (value: boolean) => {
-    const filteredGames = originalGames.filter(
-      (game) => game.standalone === value
-    );
+  const sortGames = (criteria: string, value: any) => {
+    let sortedGames = [...originalGames];
 
-    setGames(filteredGames);
+    switch (criteria) {
+      case 'releaseYear':
+        sortedGames.sort((a, b) => {
+          const aValue = a.releaseYear ?? 0;
+          const bValue = b.releaseYear ?? 0;
+          return value === 'asc' ? aValue - bValue : bValue - aValue;
+        });
+        break;
+      case 'standalone':
+        sortedGames = sortedGames.filter(game => game.standalone === value);
+        break;
+      case 'type':
+        sortedGames = sortedGames.filter(game => game.type === value);
+        break;
+      case 'publisher':
+        sortedGames = sortedGames.filter(game => game.publisher === value);
+        break;
+      default:
+        break;
+    }
+
+    setGames(sortedGames);
     setCurrentPage(1);
   };
 
-  const fetchGames = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      if (!apiUrl) {
-        throw new Error("API URL is not defined");
-      }
-      const response = await axios.get(apiUrl);
-      setGames(response.data);
-      setOriginalGames(response.data);
-    } catch (error) {
-      setError("An error occurred. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    fetchGames();
-  }, []);
-
-  const indexOfLastGame = currentPage * gamesPerPage;
-  const indexOfFirstGame = indexOfLastGame - gamesPerPage;
-  const currentGames = games.slice(indexOfFirstGame, indexOfLastGame);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value;
     if (searchValue) {
-      const filteredGames = originalGames.filter((game) =>
+      const filteredGames = originalGames.filter(game =>
         game.name.toLowerCase().includes(searchValue.toLowerCase())
       );
       setGames(filteredGames);
@@ -86,26 +89,58 @@ export default function Home() {
     }
   };
 
-  const handleSortMenuClick = (order: "asc" | "desc") => {
-    sortGamesByReleaseYear(order);
-  };
+  const fetchGames = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error("API URL is not defined");
+      }
+      const response = await axios.get(apiUrl);
+      const gamesData = response.data;
+      setGames(gamesData);
+      setOriginalGames(gamesData);
 
-  const sortMenu = (
-    <Menu>
-      <Menu.Item onClick={() => handleSortMenuClick("asc")}>
-        Sort by Release Year Asc
-      </Menu.Item>
-      <Menu.Item onClick={() => handleSortMenuClick("desc")}>
-        Sort by Release Year Desc
-      </Menu.Item>
-      <Menu.Item onClick={() => sortGamesByStandalone(false)}>
-        Show Non-Standalone Games Only
-      </Menu.Item>
-      <Menu.Item onClick={() => sortGamesByStandalone(true)}>
-        Show Standalone Games Only
-      </Menu.Item>
-    </Menu>
-  );
+      const uniquePublishers = Array.from(
+        new Set(gamesData.map((game: GameType) => game.publisher).filter(Boolean))
+      );
+
+      const publisherOptions = uniquePublishers.map((publisher) => ({
+        value: publisher,
+        label: publisher,
+      }));
+
+      const updatedOptionsFilter = [...optionsFilter];
+
+      const filterOptionIndex = updatedOptionsFilter.findIndex(option => option.value === 'filter');
+
+      if (filterOptionIndex !== -1) {
+        const publisherFilterExists = updatedOptionsFilter[filterOptionIndex].children?.some(
+          (child) => child.value === 'Publisher'
+        );
+        if (!publisherFilterExists) {
+          updatedOptionsFilter[filterOptionIndex].children?.push({
+            value: 'Publisher',
+            label: 'Publisher',
+            children: publisherOptions as OptionFilter[],
+          });
+        }
+      }
+
+      setFilteredOptions(updatedOptionsFilter);
+
+    } catch (error) {
+      setError("An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   if (loading)
     return (
@@ -118,38 +153,47 @@ export default function Home() {
   return (
     <div className={`p-12 transition-colors duration-300`}>
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <Typography.Title level={2} className="mb-6 dark:text-white">
+        <Typography.Title level={2} className="mb-6 text-2xl font-semibold dark:text-white">
           Game List
         </Typography.Title>
-
-        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
           <Input
             placeholder="Search games..."
             inputMode="search"
-            className="w-full sm:w-60 dark:bg-gray-800 placeholder:white dark:placeholder-gray-300 dark:text-white"
+            className="w-full sm:w-60 dark:bg-gray-800 placeholder-black-300 dark:placeholder-gray-300 dark:text-white border border-gray-300 dark:border-gray-700 rounded-md shadow-sm hover:border-customOrange dark:hover:border-customOrange focus:border-customOrange dark:focus:border-customOrange focus:outline-none transition duration-150 ease-in-out"
             onChange={handleSearch}
           />
-          <Dropdown overlay={sortMenu} trigger={["click"]}>
-            <div className="p-2 rounded-full bg-white dark:bg-gray-800 mb-2 cursor-pointer">
-              <FilterListIcon className="dark:text-white" />
+
+          <Cascader
+            options={filteredOptions}
+            onChange={onChange}
+            className="flex-shrink-0 w-24 sm:w-32 md:w-40 lg:w-48 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm transition duration-150 ease-in-out"
+          >
+            <FilterListIcon className="dark:text-white" />
+          </Cascader>
+
+
+          {filterValue && (
+            <div className="flex items-center cursor-pointer p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-150 ease-in-out" onClick={() => { setFilterValue(undefined); setGames(originalGames); setCurrentPage(1) }}>
+              <ClearIcon className="text-sm dark:text-white mr-1" />
+              <Typography.Text className="text-sm dark:text-white">
+                Clear filter
+              </Typography.Text>
             </div>
-          </Dropdown>
+          )}
         </div>
       </div>
 
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {loading
-          ? Array.from({ length: gamesPerPage }).map((_, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
-              >
-                <Card className={`bg-white dark:bg-gray-800`}>
-                  <Skeleton active />
-                </Card>
-              </div>
-            ))
-          : currentGames.map((game) => <GameCard key={game.id} game={game} />)}
+        {games.length > 0 ? (
+          games
+            .slice((currentPage - 1) * gamesPerPage, currentPage * gamesPerPage)
+            .map((game) => <GameCard key={game.id} game={game} />)
+        ) : (
+          <Typography.Text className="text-lg dark:text-white">No games found</Typography.Text>
+        )}
+
       </div>
 
       <div className="flex justify-center mt-10">
@@ -158,10 +202,9 @@ export default function Home() {
           pageSize={gamesPerPage}
           total={games.length}
           onChange={handlePageChange}
-          showSizeChanger={false}
-          className="bg-transparent dark:text-white"
         />
       </div>
     </div>
+
   );
 }
