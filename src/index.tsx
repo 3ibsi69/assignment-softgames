@@ -4,6 +4,8 @@ import "./index.css";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 
+
+//wrapped the App component with the ThemeProvider component to handle the theme state for dark and light mode
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

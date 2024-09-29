@@ -14,31 +14,3 @@ body {
   background-color: #2d3748;
   color: #ffffff;
 }
-
-
-
-
-.dark .ant-pagination-item a {
-  color: #F06428 !important;
-}
-
-.ant-pagination-item a {
-  color: #F06428 !important;
-}
-
-
-
-.dark .ant-pagination-prev .ant-pagination-item-link,
-.dark .ant-pagination-next .ant-pagination-item-link {
-  /* Darker border for prev/next buttons */
-  color: #F06428 !important;
-}
-
-.dark .ant-pagination-item:hover {
-  background-color: #F06428 !important;
-  border-color: #F06428 !important;
-}
-
-.dark .ant-pagination-item a:hover {
-  background-color: grey !important;
-}

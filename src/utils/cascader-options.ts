@@ -53,6 +53,20 @@ export const optionsFilter: OptionFilter[] = [
           },
         ],
       },
+      {
+        value: "player",
+        label: "Player",
+        children: [
+          {
+            value: "1",
+            label: "1 player",
+          },
+          {
+            value: "2",
+            label: "2 ≥ players",
+          },
+        ],
+      },
     ],
   },
 ];

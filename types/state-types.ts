@@ -1,3 +1,5 @@
+// Here we define the types of the state of the application
+
 export interface ThemeContextType {
   theme: string;
   toggleTheme: () => void;
